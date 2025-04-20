@@ -104,7 +104,7 @@ const PoseCanvas = ({ videoFile, liftType }) => {
           ctx.beginPath();
           ctx.moveTo(keypoints[from].x, keypoints[from].y);
           ctx.lineTo(keypoints[to].x, keypoints[to].y);
-          ctx.stroke(F);
+          ctx.stroke();
         }
       });
     });
