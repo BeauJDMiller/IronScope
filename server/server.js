@@ -24,14 +24,6 @@ const __dirname = path.dirname(__filename);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
  
-// 🔽 Serve static frontend files
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-// 🔽 Catch-all to serve React index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build/index.html'));
-});
-
 
 app.post('/create-account', (req, res) => {
     const { username, password } = req.body;
@@ -154,18 +146,12 @@ const normalizeKeypoints = (keypoints) => {
     }
   });
   
-  
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'client', 'build')));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-    });
-  }
+  const path = require('path');
   app.use(express.static(path.join(__dirname, '../client/build')));
-
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
   });
+
   // 🔽 Dynamic port for Railway
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
