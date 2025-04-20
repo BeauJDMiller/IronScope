@@ -1,0 +1,10 @@
+{
+    "name": "ironscope-monorepo",
+    "private": true,
+    "workspaces": ["client", "server"],
+    "scripts": {
+        "start": "cd server && npm start",
+        "build": "cd server && npm run build"
+    }
+  }
+  
