@@ -1,0 +1,40 @@
+```
+App maker, app maker, make me an app!
+
+I want to build a React application called "IronScope" with the following features:
+
+1. Core functionality:
+   - home page user can login with username and password and login button, or click create account button.
+   -if login, just take them to the main app page Form Analysis (no database yet, so dont need to check any passowrd)
+   - if create account, users create an account with first name, last name, username, password (no dbs setup yet, so for now just save this somewhere locally like login_info.csv with cols username, password) and click "create account"
+   -next page is membership type page.  users choose monthly subscription for $5/month or one month membership for $8.
+   - next page is payment page. Here they enter credit card info and click pay.  Stripe will handle paymet. Each of these options has a sepearte stripe price id. All the relevent API keys are in my 2 .env files, one for the front end and one for the backend server that handles the stripe payment.  Just tell me what to call the varibles in these 2 .env files.
+   - next if payment is successful, it goes to the page Form Analysis. 
+   - On Form Analysis page, which is styled to look like a minimalist app with black and red colors, they can upload a video of them performing an exercise, such as a squat, bench press, deadlift, overhead press, or bent over row.  When they upload the video, the video is analyzed by AI to determine which exercise they are performing, and a textbox appears to tell them what exercise they are doing and if they are doing it with good form. ChatGPT will handle the video analysis. I will supply the OPENAI_API_KEY in the .env file in the backend server.
+     Add some floating dumbells in the background and make them small.
+   -Add a logout button to Form Analyis that takes me back to the homepage
+
+2. Visual design:
+   - Use black/red color scheme that fits the ETHOS olympic rubber plate theme
+   - Name the app named IronScope, with a logo of a red ironsights,
+   - Floating dumbells in hte background
+3. Technical requirements:
+   - Built with React (create-react-app)
+   - Use Stripe for handling payment on a seperate backend java server
+   - Use OpenAI ChatGPT to handle the video analysis
+   - Use Tailwind CSS for styling
+   - Make it responsive for different screen sizes
+   - Add error handling for non-csv files
+
+Please generate ALL the necessary files for this application:
+1a. A complete package.json with all required dependencies for front end
+1b. A complete package.json with all required dependencies for backe end
+2. App.js with the full React component
+3. tailwind.config.js for the Tailwind setup
+4. postcss.config.js for PostCSS configuration
+5. index.css with all required styles including Tailwind directives
+6. server.js file with backend server code
+7. A components folder with all the component files.  Put all compents in here, so App.js can import them.  This makes the app more modular and eaiser to edit.
+
+I will create an app in VS code, and then add in or edit the app files.  Please provide a full file directory and insttructions on what to created or edit, and how to run the app.  Assume I begin with VS code and have already installed nodejs.
+```
