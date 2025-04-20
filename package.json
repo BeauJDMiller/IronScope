@@ -3,8 +3,8 @@
     "private": true,
     "workspaces": ["client", "server"],
     "scripts": {
-        "start": "cd server && npm start",
-        "build": "cd server && npm run build"
+        "start": "node server/server.js",
+        "build": "cd client && npm install && npm run build"
     }
   }
   
