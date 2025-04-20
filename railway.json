@@ -1,0 +1,14 @@
+{
+    "build": {
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "plugins": [],
+    "services": {
+      "web": {
+        "start": "node server.js"
+      }
+    }
+  }
+  
