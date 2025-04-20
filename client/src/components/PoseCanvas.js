@@ -5,6 +5,12 @@ import * as poseDetection from '@tensorflow-models/pose-detection';
 import axios from 'axios';
 import LiftSelector from './LiftSelector';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://your-railway-url.up.railway.app'
+  : 'http://localhost:3001';
+
+
+
 const CONNECTED_KEYPOINTS = [
   ['left_shoulder', 'right_shoulder'],
   ['left_shoulder', 'left_elbow'],
@@ -121,8 +127,8 @@ const PoseCanvas = ({ videoFile, liftType }) => {
     const video = videoRef.current;
     const imageBase64 = extractBase64Image(video);
     try {
-      const response = await axios.post('http://localhost:3001/api/analyze', {
-        keypointFrames: poseBuffer.current,
+        const response = await axios.post(`${API_BASE_URL}/api/analyze`, {
+            keypointFrames: poseBuffer.current,
         liftType: liftType || 'Unknown',
       });
       if (response.data && response.data.feedback) {
