@@ -1,9 +1,11 @@
 {
     "name": "ironscope-monorepo",
+    "version": "1.0.0",
     "private": true,
-    "workspaces": ["client", "server"],
     "scripts": {
-        "build": "cd client && npm install && npm run build"
-    }
+      "build": "npm --prefix client run build",
+      "postinstall": "npm install --prefix client"
+    },
+    "dependencies": {}
   }
   
