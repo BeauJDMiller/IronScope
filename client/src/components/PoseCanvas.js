@@ -123,7 +123,7 @@ const PoseCanvas = ({ videoFile, liftType }) => {
     if (hasAnalyzed.current) return;
     hasAnalyzed.current = true;
     setLoading(true);
-
+    // 
     const video = videoRef.current;
     const imageBase64 = extractBase64Image(video);
     try {
