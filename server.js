@@ -8,6 +8,8 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const PORT = process.env.PORT || 3001;
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -154,4 +156,6 @@ const normalizeKeypoints = (keypoints) => {
   }
   
 
-app.listen(3001, () => console.log('Server running on http://localhost:3001'));
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+  });
