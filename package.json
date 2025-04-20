@@ -1,11 +1,9 @@
 {
     "name": "ironscope-monorepo",
     "version": "1.0.0",
-    "private": true,
     "scripts": {
-      "build": "npm --prefix client run build",
-      "postinstall": "npm install --prefix client"
-    },
-    "dependencies": {}
+      "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+      "start": "node server/server.js"
+    }
   }
   
