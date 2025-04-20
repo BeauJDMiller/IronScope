@@ -6,7 +6,7 @@ import axios from 'axios';
 import LiftSelector from './LiftSelector';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://your-railway-url.up.railway.app'
+  ? 'https://web-production-a90e3.up.railway.app'
   : 'http://localhost:3001';
 
 
@@ -104,7 +104,7 @@ const PoseCanvas = ({ videoFile, liftType }) => {
           ctx.beginPath();
           ctx.moveTo(keypoints[from].x, keypoints[from].y);
           ctx.lineTo(keypoints[to].x, keypoints[to].y);
-          ctx.stroke();
+          ctx.stroke(F);
         }
       });
     });
