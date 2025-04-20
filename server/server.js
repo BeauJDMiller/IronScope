@@ -82,7 +82,7 @@ const normalizeKeypoints = (keypoints) => {
     try {
       const { keypointFrames } = req.body;
   
-      const summarized = keypointFrames.map((frame, i) => {
+      const summarized = keypointFrames.slice(0, 30).map((frame, i) => {
         const normalized = normalizeKeypoints(frame);
         const coords = normalized
           .filter(k => k.score > 0.3)
@@ -141,8 +141,8 @@ const normalizeKeypoints = (keypoints) => {
       const feedback = completion.choices[0].message.content;
       res.json({ feedback });
     } catch (error) {
-      console.error('OpenAI error:', error);
-      res.status(500).json({ error: 'Failed to generate feedback' });
+      console.error('OpenAI error:', error.response?.data || error.message || error);
+      res.status(500).json({ error: 'Failed to generate feedback', details: error.message });
     }
   });
   
