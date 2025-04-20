@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
       "start": "node server.js",
-      "heroku-postbuild": "cd client && npm install && npm run build"
+      "heroku-postbuild": "cd client && npm install && npm run build",
+      "build": "echo Skipping root build step"
     },
     "dependencies": {
       "express": "^4.21.2",
