@@ -20,7 +20,7 @@ const CONNECTED_KEYPOINTS = [
 ];
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://your-railway-url.up.railway.app'
+  ? 'https://ironscope.up.railway.app'
   : 'http://localhost:3001';
 
 const PoseCanvas = ({ videoFile, liftType, demoMode, selectedDemo }) => {
