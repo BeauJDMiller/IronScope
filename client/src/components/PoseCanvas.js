@@ -3,13 +3,6 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import axios from 'axios';
-import LiftSelector from './LiftSelector';
-
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://web-production-a90e3.up.railway.app'
-  : 'http://localhost:3001';
-
-
 
 const CONNECTED_KEYPOINTS = [
   ['left_shoulder', 'right_shoulder'],
@@ -26,50 +19,40 @@ const CONNECTED_KEYPOINTS = [
   ['right_knee', 'right_ankle']
 ];
 
-const PoseCanvas = ({ videoFile, liftType }) => {
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://your-railway-url.up.railway.app'
+  : 'http://localhost:3001';
+
+const PoseCanvas = ({ videoFile, liftType, demoMode, selectedDemo }) => {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const loopIdRef = useRef(null);
   const [detector, setDetector] = useState(null);
   const [modelLoaded, setModelLoaded] = useState(false);
   const [feedback, setFeedback] = useState('');
-  const [loading, setLoading] = useState(false);
   const poseBuffer = useRef([]);
   const hasAnalyzed = useRef(false);
-  const SMOOTHING_FACTOR = 0.7;
-  let lastPose = null;
 
-  const smoothKeypoints = (current, previous) => {
-    if (!previous) return current;
-    return current.map((point, i) => ({
-      ...point,
-      x: point.x * (1 - SMOOTHING_FACTOR) + previous[i].x * SMOOTHING_FACTOR,
-      y: point.y * (1 - SMOOTHING_FACTOR) + previous[i].y * SMOOTHING_FACTOR,
-      score: point.score * (1 - SMOOTHING_FACTOR) + previous[i].score * SMOOTHING_FACTOR,
+  const normalizeKeypoints = (keypoints) => {
+    const leftHip = keypoints.find(k => k.name === 'left_hip');
+    const rightHip = keypoints.find(k => k.name === 'right_hip');
+    const leftShoulder = keypoints.find(k => k.name === 'left_shoulder');
+    const rightShoulder = keypoints.find(k => k.name === 'right_shoulder');
+
+    if (!leftHip || !rightHip || !leftShoulder || !rightShoulder) return [];
+
+    const hipCenterX = (leftHip.x + rightHip.x) / 2;
+    const hipCenterY = (leftHip.y + rightHip.y) / 2;
+    const shoulderCenterY = (leftShoulder.y + rightShoulder.y) / 2;
+    const height = Math.max(1, Math.abs(shoulderCenterY - hipCenterY));
+
+    return keypoints.map(k => ({
+      name: k.name,
+      x: ((k.x - hipCenterX) / height).toFixed(3),
+      y: ((k.y - hipCenterY) / height).toFixed(3),
+      score: k.score.toFixed(2)
     }));
   };
-
-  useEffect(() => {
-    const setup = async () => {
-      try {
-        await tf.setBackend('webgl');
-        await tf.ready();
-        const detectorConfig = {
-          modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-        };
-        const createdDetector = await poseDetection.createDetector(
-          poseDetection.SupportedModels.MoveNet,
-          detectorConfig
-        );
-        setDetector(createdDetector);
-        setModelLoaded(true);
-        console.log('✅ Pose detector loaded.');
-      } catch (err) {
-        console.error('❌ Initialization failed:', err);
-      }
-    };
-    setup();
-  }, []);
 
   const drawSkeleton = (poses, displayWidth, displayHeight, inputWidth, inputHeight) => {
     const canvas = canvasRef.current;
@@ -110,34 +93,20 @@ const PoseCanvas = ({ videoFile, liftType }) => {
     });
   };
 
-  const extractBase64Image = (video) => {
-    const offscreen = document.createElement('canvas');
-    offscreen.width = video.videoWidth;
-    offscreen.height = video.videoHeight;
-    const ctx = offscreen.getContext('2d');
-    ctx.drawImage(video, 0, 0);
-    return offscreen.toDataURL('image/jpeg').split(',')[1];
-  };
-
   const analyzeFullPoseSequence = async () => {
     if (hasAnalyzed.current) return;
     hasAnalyzed.current = true;
-    setLoading(true);
-    // 
-    const video = videoRef.current;
-    const imageBase64 = extractBase64Image(video);
+
     try {
         const response = await axios.post(`${API_BASE_URL}/api/analyze`, {
-            keypointFrames: poseBuffer.current,
-        liftType: liftType || 'Unknown',
+        keypointFrames: poseBuffer.current,
+        liftType: liftType || selectedDemo || 'Unknown',
       });
       if (response.data && response.data.feedback) {
         setFeedback(response.data.feedback);
       }
     } catch (err) {
       console.error('❌ Failed to get form feedback:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -159,12 +128,6 @@ const PoseCanvas = ({ videoFile, liftType }) => {
         const imageTensor = tf.browser.fromPixels(offscreenCanvas);
         const poses = await detector.estimatePoses(imageTensor, { flipHorizontal: false });
         imageTensor.dispose();
-
-        if (poses.length > 0) {
-          const smoothedKeypoints = smoothKeypoints(poses[0].keypoints, lastPose);
-          poses[0].keypoints = smoothedKeypoints;
-          lastPose = smoothedKeypoints;
-        }
 
         drawSkeleton(poses, displayWidth, displayHeight, inputWidth, inputHeight);
 
@@ -203,18 +166,49 @@ const PoseCanvas = ({ videoFile, liftType }) => {
   };
 
   useEffect(() => {
-    if (videoFile && modelLoaded) {
-      const video = videoRef.current;
-      const waitForMetadata = () => {
-        if (video.readyState >= 1 && video.videoHeight > 0) {
-          initPlaybackAndTracking();
-        } else {
-          setTimeout(waitForMetadata, 100);
-        }
+    const loadDetector = async () => {
+      await tf.setBackend('webgl');
+      await tf.ready();
+      const detectorConfig = {
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
       };
-      waitForMetadata();
+      const createdDetector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        detectorConfig
+      );
+      setDetector(createdDetector);
+      setModelLoaded(true);
+      console.log('✅ Pose detector loaded.');
+    };
+    loadDetector();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !modelLoaded) return;
+  
+    hasAnalyzed.current = false;
+    setFeedback('');
+  
+    if (demoMode) {
+      const demoPath = `/demo-videos/${selectedDemo}.mp4`;
+      video.src = demoPath;
+    } else {
+      video.src = videoFile;
     }
-  }, [videoFile, modelLoaded]);
+  
+    const waitForMetadata = () => {
+      if (video.readyState >= 1 && video.videoHeight > 0) {
+        initPlaybackAndTracking();
+      } else {
+        setTimeout(waitForMetadata, 100);
+      }
+    };
+  
+    video.load();
+    waitForMetadata();
+  }, [videoFile, modelLoaded, demoMode, selectedDemo]);
+  
 
   const handleReplay = () => {
     const video = videoRef.current;
@@ -225,47 +219,41 @@ const PoseCanvas = ({ videoFile, liftType }) => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 justify-center mt-4 px-4">
-      <div className="relative" style={{ maxHeight: '80vh' }}>
+    <div className="flex flex-col lg:flex-row items-start justify-center mt-4 space-y-4 lg:space-y-0 lg:space-x-4">
+      <div className="relative" style={{ width: 'fit-content', maxWidth: '100%' }}>
         <video
           ref={videoRef}
-          src={videoFile}
           className="absolute top-0 left-0 z-0"
           playsInline
           muted
           controls
+          style={{ width: '100%' }}
         />
         <canvas
           ref={canvasRef}
           className="relative z-10 border"
+          style={{ display: 'block' }}
         />
         <div className="text-center mt-2">
           <button
             onClick={handleReplay}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded mt-2"
           >
             Replay Video
           </button>
         </div>
       </div>
-      <div className="flex-1 max-w-xl text-white bg-zinc-900 p-4 rounded shadow-lg overflow-y-auto max-h-[85vh]">
-        {loading ? (
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white mb-2"></div>
-            <p className="text-sm">Analyzing form...</p>
-          </div>
-        ) : feedback ? (
-          <div>
-            <h2 className="text-xl font-bold mb-2">💬 AI Feedback</h2>
-            <div
-              className="text-sm leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: feedback }}
-            ></div>
-          </div>
-        ) : null}
-      </div>
+  
+      {feedback && (
+        <div
+          className="bg-black text-white p-4 rounded w-full lg:w-[400px] max-w-full overflow-auto"
+          dangerouslySetInnerHTML={{ __html: feedback }}
+        />
+      )}
     </div>
   );
+  
+  
 };
 
 export default PoseCanvas;
