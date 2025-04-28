@@ -133,6 +133,108 @@ const normalizeKeypoints = (keypoints) => {
       res.status(500).json({ error: 'Failed to generate feedback', details: error.message });
     }
   });
+
+
+  app.post('/api/generate-workout', async (req, res) => {
+    try {
+      const inputs = req.body;
+  
+      // Construct a detailed system prompt
+      const systemPrompt = `
+  You are a certified barbell strength coach and AI workout generator.
+  You create Starting Strength-style barbell-based workout programs, adapting for user training goals, experience, and preferences. Output all workout days in a clear, repeatable format, as in the example below.
+  
+  --- Output format example ---
+  **Week 1 – Day 1: Workout A (Strength Focus)**
+  Training Goal: Strength + Cardio
+  Bodyweight Goal: Gain Muscle
+  Session Duration: 60 min
+  Experience: Beginner
+  
+  ---
+  
+  ### 🔥 Warm-Up Routine
+  - Foam Rolling: Quads, Glutes, T-Spine (30 sec each)
+  - Dynamic Prep: Leg Swings, Arm Circles, Bodyweight Squats, Shoulder Dislocates
+  - Barbell Warm-Up: Progress to working weight in 2–3 sets
+  
+  ---
+  
+  ### 🏋️‍♂️ Main Lifts
+  1. **Squat** – 3x5 @ [weight] lbs  
+  2. **Overhead Press** – 3x5 @ [weight] lbs  
+  3. **Deadlift** – 1x5 @ [weight] lbs  
+  
+  ---
+  
+  ### 💪 Accessory or Auxiliary Work (Optional)
+  - Chin-Ups – 3 sets to failure (or band assist)
+  
+  ---
+  
+  ### 🦀 Cardio Add-On
+  - Zone 2: 25 min incline walk @ 8% incline  
+  - HR: 120–140 bpm
+  
+  ---
+  
+  ### 🧊 Cooldown
+  - Deep squat hold – 1 min
+  - Child’s pose – 1 min
+  - Diaphragmatic breathing – 2 min
+  
+  ---
+  
+  ### 📝 Notes
+  - Add 5 lbs next session if completed with good form
+  - Rest tomorrow (or light cardio if selected)
+  ---
+  
+  Always use this style, adapt programming to user preferences and restrictions, and give realistic weights if user working weights are provided. Avoid disclaimers and stick to the format.
+      `;
+  
+      // User prompt based on user inputs
+      const userPrompt = `
+  User Profile:
+  - Training Goal: ${inputs.trainingGoal}
+  - Experience Level: ${inputs.experienceLevel}
+  - Lifting Days per Week: ${inputs.liftingDays}
+  - Cardio Days per Week: ${inputs.cardioDays}
+  - Session Duration: ${inputs.sessionDuration}
+  - Bodyweight Goal: ${inputs.bodyweightGoal}
+  - Current Weight: ${inputs.currentWeight}
+  - Cardio Goal: ${inputs.cardioGoal}
+  - Cardio Preference: ${inputs.cardioPref}
+  - Working Weights: 
+      Squat: ${inputs.workingWeights?.squat || 'Not Provided'}, 
+      Deadlift: ${inputs.workingWeights?.deadlift || 'Not Provided'}, 
+      Bench: ${inputs.workingWeights?.bench || 'Not Provided'}, 
+      Overhead Press: ${inputs.workingWeights?.ohp || 'Not Provided'}, 
+      Power Clean: ${inputs.workingWeights?.powerclean || 'Not Provided'}
+  - Injury/Movement Restrictions: ${inputs.restrictions || 'None'}
+  
+  Generate a single day workout for the user using the template above.
+      `;
+  
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o', // or 'gpt-3.5-turbo' if needed
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        max_tokens: 500,
+      });
+  
+      const workout = completion.choices[0].message.content;
+      res.json({ workout });
+    } catch (error) {
+      console.error('OpenAI error:', error.response?.data || error.message || error);
+      res.status(500).json({ error: 'Failed to generate workout', details: error.message });
+    }
+  });
+  
+
+
   
   app.use(express.static(path.join(__dirname, '../client/build')));
   app.get('*', (req, res) => {
