@@ -11,6 +11,10 @@ const cardioGoals = ["None", "General Health", "Improve Endurance", "Fat Loss Su
 const cardioPrefs = ["Zone 2 (Steady)", "HIIT", "Rucking", "Running", "Rowing/Bike", "No Preference"];
 const lifts = ["Squat", "Deadlift", "Bench Press", "Overhead Press", "Power Clean"];
 
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ironscope.up.railway.app'
+  : 'http://localhost:3001';
+
 export default function WorkoutSuggestion() {
   const [inputs, setInputs] = useState({
     trainingGoal: "",
@@ -79,7 +83,7 @@ export default function WorkoutSuggestion() {
     setWorkout(null);
     // Call the new AI endpoint!
     try {
-        const res = await fetch('http://localhost:3001/api/generate-workout', {
+        const res = await fetch(`${API_BASE_URL}/api/generate-workout`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(inputs),
