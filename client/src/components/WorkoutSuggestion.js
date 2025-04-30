@@ -143,7 +143,7 @@ export default function WorkoutSuggestion() {
     if (!selectedDay) {
       return (
         <div className="text-center text-gray-400 italic mb-6">
-          Select a day to view workout details.
+          Enter your preferences below to generate workout.
         </div>
       );
     }
