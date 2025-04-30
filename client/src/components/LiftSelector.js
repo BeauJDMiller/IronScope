@@ -9,11 +9,12 @@ const LiftSelector = ({ selectedLift, onSelect }) => {
         <button
           key={lift}
           onClick={() => onSelect(lift)}
-          className={`w-24 h-24 border-2 rounded-lg font-semibold text-sm sm:text-base text-center flex items-center justify-center text-wrap px-2
-            ${selectedLift === lift
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white text-gray-800 border-gray-300'}
-            hover:shadow-lg transition-all`}
+          className={`w-28 h-28 rounded-xl font-bold text-sm sm:text-base text-center flex items-center justify-center px-3 text-white transition
+            ${
+              selectedLift === lift
+                ? 'bg-pink-600 shadow-lg'
+                : 'bg-[#1C1C1E] hover:bg-[#2C2C2E]'
+            }`}
         >
           {lift}
         </button>

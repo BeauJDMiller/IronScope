@@ -7,12 +7,13 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "express": "^4.21.2",
     "fs": "^0.0.1-security",
+    "ironscope-monorepo": "file:..",
+    "multer": "^1.4.5-lts.1",
     "openai": "^4.95.1",
-    "stripe": "^12.11.0",
-    "multer": "^1.4.5-lts.1"
+    "stripe": "^12.11.0"
   }
 }

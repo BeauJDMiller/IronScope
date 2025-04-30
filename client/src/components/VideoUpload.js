@@ -17,14 +17,11 @@ const VideoUpload = ({ setAnalysis }) => {
     try {
       setLoading(true);
 
-      // Load FFmpeg if it's not already
       if (!ffmpeg.loaded) await ffmpeg.load();
 
-      // Convert video to buffer and write to FFmpeg FS
       const buffer = await file.arrayBuffer();
       ffmpeg.writeFile('input.mov', new Uint8Array(buffer));
 
-      // Compress the video (reduce resolution and framerate)
       await ffmpeg.exec([
         '-i', 'input.mov',
         '-vf', 'scale=360:-2,fps=10',
@@ -34,18 +31,14 @@ const VideoUpload = ({ setAnalysis }) => {
         'output.mp4'
       ]);
 
-      // Read back the compressed video
       const outputData = await ffmpeg.readFile('output.mp4');
       const blob = new Blob([outputData.buffer], { type: 'video/mp4' });
 
-      // Send as multipart/form-data to the server
       const formData = new FormData();
       formData.append('video', blob);
 
       const res = await axios.post('http://localhost:3001/analyze-video', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       setAnalysis(res.data.analysis);
@@ -58,15 +51,15 @@ const VideoUpload = ({ setAnalysis }) => {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center text-white w-full max-w-md mx-auto">
       <input
         type="file"
         accept="video/*"
         onChange={handleVideo}
-        className="bg-gray-800 text-white px-4 py-2 rounded mb-4"
+        className="bg-[#1C1C1E] border border-gray-700 text-white px-4 py-2 rounded-xl mb-4 w-full cursor-pointer hover:bg-[#2C2C2E] transition"
       />
       {loading && (
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-pink-400 text-center animate-pulse">
           Compressing & uploading video... please wait
         </p>
       )}

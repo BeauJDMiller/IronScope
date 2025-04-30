@@ -237,7 +237,7 @@ const PoseCanvas = ({ videoFile, liftType, demoMode, selectedDemo }) => {
         <div className="text-center mt-2">
           <button
             onClick={handleReplay}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded mt-2"
+            className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-1 px-3 rounded-xl mt-2"
           >
             Replay Video
           </button>
@@ -246,7 +246,7 @@ const PoseCanvas = ({ videoFile, liftType, demoMode, selectedDemo }) => {
   
       {feedback && (
         <div
-          className="bg-black text-white p-4 rounded w-full lg:w-[400px] max-w-full overflow-auto"
+          className="bg-[#0A0A0A] text-white p-4 rounded-xl w-full lg:w-[400px] max-w-full overflow-auto"
           dangerouslySetInnerHTML={{ __html: feedback }}
         />
       )}

@@ -136,102 +136,88 @@ const normalizeKeypoints = (keypoints) => {
 
 
   app.post('/api/generate-workout', async (req, res) => {
+    const inputs = req.body;
+  
+    const systemPrompt = `
+    You are a professional strength coach and AI assistant trained in Starting Strength. Generate a personalized 6-week workout program in structured JSON format.
+
+First, create a weekly_schedule object nested inside overview. Each week should contain seven days labeled with one of the following:
+
+"Workout A"
+
+"Workout B"
+
+"Cardio (Zone 2)"
+
+"Cardio (HIIT)"
+
+"Rest"
+
+Then, include a details object that contains definitions for every unique workout type used in the schedule. Each workout should have the following keys:
+
+warmup (array of strings)
+
+lifts (array of objects with: exercise, sets, reps, weight)
+
+accessory (array of strings)
+
+cardio (string or null)
+
+cooldown (array of strings)
+
+The final output must be a single valid JSON object with two top-level keys:
+
+overview: containing the 6-week schedule under weekly_schedule
+
+details: containing detailed instructions for each workout label used
+
+Format example:
+
+{ "overview": { "weekly_schedule": { "Week 1": { "Mon": "Workout A", "Tue": "Rest", "Wed": "Workout B", "Thu": "Cardio (Zone 2)", "Fri": "Workout A", "Sat": "Rest", "Sun": "Cardio (HIIT)" }, "Week 2": { "Mon": "Workout B", "Tue": "Cardio (Zone 2)", "Wed": "Workout A", "Thu": "Rest", "Fri": "Workout B", "Sat": "Cardio (Zone 2)", "Sun": "Rest" } } }, "details": { "Workout A": { "warmup": [ "Foam rolling: quads, glutes, T-spine", "Dynamic prep: squats, leg swings, shoulder circles" ], "lifts": [ { "exercise": "Squat", "sets": 3, "reps": 5, "weight": 185 }, { "exercise": "Overhead Press", "sets": 3, "reps": 5, "weight": 95 }, { "exercise": "Deadlift", "sets": 1, "reps": 5, "weight": 225 } ], "accessory": ["Chin-ups – 3 sets to failure"], "cardio": null, "cooldown": ["Squat hold – 1 min", "Diaphragmatic breathing – 2 min"] }, "Cardio (Zone 2)": { "warmup": ["Brisk walking – 5 min"], "lifts": [], "accessory": [], "cardio": "Incline treadmill walking – 25 min at 120–140 bpm", "cooldown": ["Light stretching"] } } }
+
+Do not return any commentary, headers, or markdown formatting — just a pure JSON object. Ensure JSON is valid and does not contain duplicate keys.
+    `;
+    
+    const userPrompt = `
+      User Profile:
+    - Training Goal: ${inputs.trainingGoal}
+    - Experience Level: ${inputs.experienceLevel}
+    - Lifting Days per Week: ${inputs.liftingDays}
+    - Cardio Days per Week: ${inputs.cardioDays}
+    - Session Duration: ${inputs.sessionDuration}
+    - Bodyweight Goal: ${inputs.bodyweightGoal}
+    - Current Weight: ${inputs.currentWeight || "Not Provided"}
+    - Cardio Goal: ${inputs.cardioGoal}
+    - Cardio Preference: ${inputs.cardioPref || "None"}
+    - Working Weights:
+        Squat: ${inputs.workingWeights?.squat || 'Not Provided'},
+        Deadlift: ${inputs.workingWeights?.deadlift || 'Not Provided'},
+        Bench: ${inputs.workingWeights?.bench || 'Not Provided'},
+        Overhead Press: ${inputs.workingWeights?.ohp || 'Not Provided'},
+        Power Clean: ${inputs.workingWeights?.powerclean || 'Not Provided'}
+    - Injury/Movement Restrictions: ${inputs.restrictions || 'None'}
+
+    Generate a 6-week structured JSON workout plan using the system format.
+`;
+  
     try {
-      const inputs = req.body;
-  
-      // Construct a detailed system prompt
-      const systemPrompt = `
-  You are a certified barbell strength coach and AI workout generator.
-  You create Starting Strength-style barbell-based workout programs, adapting for user training goals, experience, and preferences. Output all workout days in a clear, repeatable format, as in the example below.
-  
-  --- Output format example ---
-  **Week 1 – Day 1: Workout A (Strength Focus)**
-  Training Goal: Strength + Cardio
-  Bodyweight Goal: Gain Muscle
-  Session Duration: 60 min
-  Experience: Beginner
-  
-  ---
-  
-  ### 🔥 Warm-Up Routine
-  - Foam Rolling: Quads, Glutes, T-Spine (30 sec each)
-  - Dynamic Prep: Leg Swings, Arm Circles, Bodyweight Squats, Shoulder Dislocates
-  - Barbell Warm-Up: Progress to working weight in 2–3 sets
-  
-  ---
-  
-  ### 🏋️‍♂️ Main Lifts
-  1. **Squat** – 3x5 @ [weight] lbs  
-  2. **Overhead Press** – 3x5 @ [weight] lbs  
-  3. **Deadlift** – 1x5 @ [weight] lbs  
-  
-  ---
-  
-  ### 💪 Accessory or Auxiliary Work (Optional)
-  - Chin-Ups – 3 sets to failure (or band assist)
-  
-  ---
-  
-  ### 🦀 Cardio Add-On
-  - Zone 2: 25 min incline walk @ 8% incline  
-  - HR: 120–140 bpm
-  
-  ---
-  
-  ### 🧊 Cooldown
-  - Deep squat hold – 1 min
-  - Child’s pose – 1 min
-  - Diaphragmatic breathing – 2 min
-  
-  ---
-  
-  ### 📝 Notes
-  - Add 5 lbs next session if completed with good form
-  - Rest tomorrow (or light cardio if selected)
-  ---
-  
-  Always use this style, adapt programming to user preferences and restrictions, and give realistic weights if user working weights are provided. Avoid disclaimers and stick to the format.
-      `;
-  
-      // User prompt based on user inputs
-      const userPrompt = `
-  User Profile:
-  - Training Goal: ${inputs.trainingGoal}
-  - Experience Level: ${inputs.experienceLevel}
-  - Lifting Days per Week: ${inputs.liftingDays}
-  - Cardio Days per Week: ${inputs.cardioDays}
-  - Session Duration: ${inputs.sessionDuration}
-  - Bodyweight Goal: ${inputs.bodyweightGoal}
-  - Current Weight: ${inputs.currentWeight}
-  - Cardio Goal: ${inputs.cardioGoal}
-  - Cardio Preference: ${inputs.cardioPref}
-  - Working Weights: 
-      Squat: ${inputs.workingWeights?.squat || 'Not Provided'}, 
-      Deadlift: ${inputs.workingWeights?.deadlift || 'Not Provided'}, 
-      Bench: ${inputs.workingWeights?.bench || 'Not Provided'}, 
-      Overhead Press: ${inputs.workingWeights?.ohp || 'Not Provided'}, 
-      Power Clean: ${inputs.workingWeights?.powerclean || 'Not Provided'}
-  - Injury/Movement Restrictions: ${inputs.restrictions || 'None'}
-  
-  Generate a single day workout for the user using the template above.
-      `;
-  
       const completion = await openai.chat.completions.create({
-        model: 'gpt-4o', // or 'gpt-3.5-turbo' if needed
+        model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
+          { role: 'user', content: userPrompt }
         ],
-        max_tokens: 500,
+        temperature: 0.7,
       });
-  
-      const workout = completion.choices[0].message.content;
-      res.json({ workout });
+      console.log('OpenAI response:', completion.choices[0].message.content); // 👈 Add this
+      const plan = JSON.parse(completion.choices[0].message.content);
+      res.json(plan);
     } catch (error) {
-      console.error('OpenAI error:', error.response?.data || error.message || error);
-      res.status(500).json({ error: 'Failed to generate workout', details: error.message });
+      console.error('Workout generation error:', error);
+      res.status(500).json({ details: { error: 'Failed to generate workout plan.' } });
     }
   });
+  
   
 
 

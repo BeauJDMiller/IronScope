@@ -31,28 +31,29 @@ const FormAnalysis = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 p-6 relative">
+    <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 p-6 relative text-white">
       {/* Main Content, Centered */}
-      <div className="w-full flex flex-col items-center space-y-4">
-      <h1 className="text-3xl font-bold mb-2 text-center">Upload a Video for Form Analysis</h1>
+      <div className="w-full flex flex-col items-center space-y-6">
 
-        {/* Always visible toggle */}
+        <h1 className="text-3xl font-bold text-center mb-4">Upload a Video for Form Analysis</h1>
+
+        {/* Toggle Button */}
         <button
           onClick={() => {
             setDemoMode(!demoMode);
             setRunDemo(false);
             setVideoURL(null);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+          className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-5 rounded-xl transition"
         >
           {demoMode ? 'Switch to Upload Mode' : 'Switch to Demo Mode'}
         </button>
 
         {/* Demo Mode */}
         {demoMode && (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-4">
             <select
-              className="bg-zinc-800 text-white border border-white p-1 rounded"
+              className="bg-[#1C1C1E] border border-gray-700 text-white p-2 rounded-lg focus:outline-none"
               value={selectedDemo}
               onChange={(e) => setSelectedDemo(e.target.value)}
             >
@@ -61,7 +62,7 @@ const FormAnalysis = () => {
             </select>
             <button
               onClick={handleRunDemo}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded"
+              className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-5 rounded-xl transition"
             >
               Run Demo
             </button>
@@ -71,18 +72,18 @@ const FormAnalysis = () => {
         {/* Upload Mode */}
         {!demoMode && (
           <>
-            <p className="text-lg font-medium">Select a lift:</p>
+            <p className="text-lg font-semibold text-center">Select a Lift:</p>
             <LiftSelector selectedLift={selectedLift} onSelect={setSelectedLift} />
             <input
               type="file"
               accept="video/*"
               onChange={handleFileChange}
-              className="mb-4"
+              className="mt-4 text-sm"
             />
           </>
         )}
 
-        {/* Video/Canvas section - centered and responsive */}
+        {/* Video/Canvas */}
         {(videoURL || runDemo) && (
           <div className="w-full flex justify-center">
             <PoseCanvas

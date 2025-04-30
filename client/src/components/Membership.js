@@ -10,10 +10,23 @@ const Membership = () => {
   };
 
   return (
-    <div className="text-center p-8">
-      <h2 className="text-2xl mb-4">Choose Your Membership</h2>
-      <button onClick={() => selectPlan('monthly')} className="bg-primary m-2 px-4 py-2 rounded">$5/month</button>
-      <button onClick={() => selectPlan('onetime')} className="border m-2 px-4 py-2 rounded">$8 one-time</button>
+    <div className="text-white p-8 max-w-lg mx-auto text-center">
+      <h2 className="text-3xl font-bold mb-8">Choose Your Membership</h2>
+
+      <div className="flex flex-col sm:flex-row justify-center gap-6">
+        <button
+          onClick={() => selectPlan('monthly')}
+          className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-6 rounded-xl shadow transition"
+        >
+          $5/month
+        </button>
+        <button
+          onClick={() => selectPlan('onetime')}
+          className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white font-bold py-3 px-6 rounded-xl border border-gray-700 transition"
+        >
+          $8 one-time
+        </button>
+      </div>
     </div>
   );
 };

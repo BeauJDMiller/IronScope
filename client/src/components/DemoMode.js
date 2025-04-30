@@ -21,7 +21,7 @@ const DemoMode = () => {
             <button
               key={idx}
               onClick={() => setSelected(vid)}
-              className="block bg-blue-600 hover:bg-blue-700 rounded px-4 py-2"
+              className="block bg-pink-600 hover:bg-pink-700 rounded px-4 py-2"
             >
               ▶ {vid.name}
             </button>

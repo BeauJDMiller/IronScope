@@ -9,9 +9,14 @@ const Payment = () => {
   };
 
   return (
-    <div className="text-center p-8">
-      <h2 className="text-2xl mb-4">Payment</h2>
-      <button onClick={handleCheckout} className="bg-primary px-4 py-2 rounded">Pay Now</button>
+    <div className="text-white p-8 max-w-md mx-auto text-center">
+      <h2 className="text-3xl font-bold mb-8">Payment</h2>
+      <button
+        onClick={handleCheckout}
+        className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl shadow transition"
+      >
+        Pay Now
+      </button>
     </div>
   );
 };
