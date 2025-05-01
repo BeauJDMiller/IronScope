@@ -142,37 +142,23 @@ const normalizeKeypoints = (keypoints) => {
     You are a professional strength coach and AI assistant trained in Starting Strength. Generate a personalized 6-week workout program in structured JSON format.
 
 First, create a weekly_schedule object nested inside overview. Each week should contain seven days labeled with one of the following:
-
-"Workout A"
-
-"Workout B"
-
-"Cardio (Zone 2)"
-
-"Cardio (HIIT)"
-
-"Rest"
-
+-"Workout A"
+-"Workout B"
+-"Cardio (Zone 2)"
+-"Cardio (HIIT)"
+-"Rest"
 Then, include a details object that contains definitions for every unique workout type used in the schedule. Each workout should have the following keys:
-
-warmup (array of strings)
-
-lifts (array of objects with: exercise, sets, reps, weight)
-
-accessory (array of strings)
-
-cardio (string or null)
-
-cooldown (array of strings)
+-warmup (array of strings)
+-lifts (array of objects with: exercise, sets, reps, weight in terms of lbs)
+-accessory (array of strings)
+-cardio (string or null)
+-cooldown (array of strings)
 
 The final output must be a single valid JSON object with two top-level keys:
-
 overview: containing the 6-week schedule under weekly_schedule
-
 details: containing detailed instructions for each workout label used
 
 Format example:
-
 { "overview": { "weekly_schedule": { "Week 1": { "Mon": "Workout A", "Tue": "Rest", "Wed": "Workout B", "Thu": "Cardio (Zone 2)", "Fri": "Workout A", "Sat": "Rest", "Sun": "Cardio (HIIT)" }, "Week 2": { "Mon": "Workout B", "Tue": "Cardio (Zone 2)", "Wed": "Workout A", "Thu": "Rest", "Fri": "Workout B", "Sat": "Cardio (Zone 2)", "Sun": "Rest" } } }, "details": { "Workout A": { "warmup": [ "Foam rolling: quads, glutes, T-spine", "Dynamic prep: squats, leg swings, shoulder circles" ], "lifts": [ { "exercise": "Squat", "sets": 3, "reps": 5, "weight": 185 }, { "exercise": "Overhead Press", "sets": 3, "reps": 5, "weight": 95 }, { "exercise": "Deadlift", "sets": 1, "reps": 5, "weight": 225 } ], "accessory": ["Chin-ups – 3 sets to failure"], "cardio": null, "cooldown": ["Squat hold – 1 min", "Diaphragmatic breathing – 2 min"] }, "Cardio (Zone 2)": { "warmup": ["Brisk walking – 5 min"], "lifts": [], "accessory": [], "cardio": "Incline treadmill walking – 25 min at 120–140 bpm", "cooldown": ["Light stretching"] } } }
 
 Do not return any commentary, headers, or markdown formatting — just a pure JSON object. Ensure JSON is valid and does not contain duplicate keys.
@@ -198,6 +184,11 @@ Do not return any commentary, headers, or markdown formatting — just a pure JS
     - Injury/Movement Restrictions: ${inputs.restrictions || 'None'}
 
     Generate a 6-week structured JSON workout plan using the system format.
+    Include the following details:
+    - For each workout, provide a warmup, lifts (with sets, reps, and weights), accessory work, cardio (if applicable), and cooldown.
+    - Ensure the plan is balanced and progressive, considering the user's goals and experience level.
+    - For the progression, increase weights by 5-10% weekly for compound lifts and 2.5-5% for accessory lifts.
+    - Include rest days and cardio sessions as per the user's preferences. If the user has requested no cardio, ensure that the plan reflects this.
 `;
   
     try {
