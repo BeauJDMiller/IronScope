@@ -101,11 +101,32 @@ export default function WorkoutSuggestion() {
     setLoading(false);
   }
 
+  const convertToWeekdays = (schedule) => {
+    const dayMap = {
+      "Day 1": "Mon",
+      "Day 2": "Tue",
+      "Day 3": "Wed",
+      "Day 4": "Thu",
+      "Day 5": "Fri",
+      "Day 6": "Sat",
+      "Day 7": "Sun",
+    };
+    const fixed = {};
+    for (const [week, days] of Object.entries(schedule)) {
+      fixed[week] = {};
+      for (const [dayKey, value] of Object.entries(days)) {
+        fixed[week][dayMap[dayKey] || dayKey] = value;
+      }
+    }
+    return fixed;
+  };
+  
+
   function renderTable(overview) {
-    const schedule = overview?.weekly_schedule || {};
+    const schedule = convertToWeekdays(overview?.weekly_schedule || {});
     const weeks = Object.keys(schedule);
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
+    
     return (
       <div className="overflow-x-auto mb-8">
         <h2 className="text-3xl font-extrabold mb-4 text-center text-white tracking-wide">YOUR WORKOUT</h2>

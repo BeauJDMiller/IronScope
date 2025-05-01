@@ -162,6 +162,7 @@ Format example:
 { "overview": { "weekly_schedule": { "Week 1": { "Mon": "Workout A", "Tue": "Rest", "Wed": "Workout B", "Thu": "Cardio (Zone 2)", "Fri": "Workout A", "Sat": "Rest", "Sun": "Cardio (HIIT)" }, "Week 2": { "Mon": "Workout B", "Tue": "Cardio (Zone 2)", "Wed": "Workout A", "Thu": "Rest", "Fri": "Workout B", "Sat": "Cardio (Zone 2)", "Sun": "Rest" } } }, "details": { "Workout A": { "warmup": [ "Foam rolling: quads, glutes, T-spine", "Dynamic prep: squats, leg swings, shoulder circles" ], "lifts": [ { "exercise": "Squat", "sets": 3, "reps": 5, "weight": 185 }, { "exercise": "Overhead Press", "sets": 3, "reps": 5, "weight": 95 }, { "exercise": "Deadlift", "sets": 1, "reps": 5, "weight": 225 } ], "accessory": ["Chin-ups – 3 sets to failure"], "cardio": null, "cooldown": ["Squat hold – 1 min", "Diaphragmatic breathing – 2 min"] }, "Cardio (Zone 2)": { "warmup": ["Brisk walking – 5 min"], "lifts": [], "accessory": [], "cardio": "Incline treadmill walking – 25 min at 120–140 bpm", "cooldown": ["Light stretching"] } } }
 
 Do not return any commentary, headers, or markdown formatting — just a pure JSON object. Ensure JSON is valid and does not contain duplicate keys.
+Output the weekly_schedule using abbreviated weekday names as keys: "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" – not "Day 1", "Day 2", etc.
     `;
     
     const userPrompt = `
