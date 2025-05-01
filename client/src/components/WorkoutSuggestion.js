@@ -29,7 +29,7 @@ export default function WorkoutSuggestion() {
     restrictions: "",
   });
   const [plan, setPlan] = useState({ overview: { weekly_schedule: {} }, details: {} });
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState({ label: null, week: null, day: null });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -147,7 +147,14 @@ export default function WorkoutSuggestion() {
                   <td
                     key={day}
                     className="border border-gray-700 px-3 py-2 text-center cursor-pointer hover:bg-pink-900 transition"
-                    onClick={() => setSelectedDay(schedule[week]?.[day])}
+                    onClick={() =>
+                      setSelectedDay({
+                        label: schedule[week]?.[day],
+                        week,
+                        day,
+                      })
+                    }
+                    
                   >
                     {schedule[week]?.[day] || ""}
                   </td>
@@ -161,19 +168,20 @@ export default function WorkoutSuggestion() {
   }
 
   function renderDetails(details) {
-    if (!selectedDay) {
+    if (!selectedDay.label) {
       return (
         <div className="text-center text-gray-400 italic mb-6">
           Enter your preferences below to generate workout.
         </div>
       );
     }
-    if (!details[selectedDay]) return null;
-    const data = details[selectedDay];
+    if (!details[selectedDay.label]) return null;
+    const data = details[selectedDay.label];
+    const week = parseInt(selectedDay.week.slice(-1));    
 
     return (
       <div className="bg-[#1C1C1E] p-4 rounded-xl shadow-md border border-pink-600 w-full mb-6">
-        <h3 className="text-xl font-bold mb-2 text-blue-300">{selectedDay}</h3>
+        <h3 className="text-xl font-bold mb-2 text-blue-300">{selectedDay.label}</h3>
         {data.error ? (
           <p>{data.error}</p>
         ) : (
@@ -183,7 +191,7 @@ export default function WorkoutSuggestion() {
                 <h4 className="font-semibold text-pink-400 capitalize">{section}</h4>
                 <ul className="list-disc ml-6 text-white">
                   {Array.isArray(data[section]) ? (
-                    data[section].map((item, i) => <li key={i}>{typeof item === 'string' ? item : `${item.exercise} – ${item.sets}x${item.reps} @ ${item.weight} lbs`}</li>)
+                    data[section].map((item, i) => <li key={i}>{typeof item === 'string' ? item : `${item.exercise} – ${item.sets}x${item.reps} @ ${parseInt(parseInt(item.weight)*(1+0.05*week))} lbs`}</li>)
                   ) : (
                     <li>{data[section]}</li>
                   )}

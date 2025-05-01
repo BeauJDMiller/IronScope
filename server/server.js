@@ -163,6 +163,7 @@ Format example:
 
 Do not return any commentary, headers, or markdown formatting — just a pure JSON object. Ensure JSON is valid and does not contain duplicate keys.
 Output the weekly_schedule using abbreviated weekday names as keys: "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" – not "Day 1", "Day 2", etc.
+Make sure the weight for each lift is represented in lbs, not "Beginner" or "Weight". Use the user's working weights for the lifts and adjust them according to the user's experience level.
     `;
     
     const userPrompt = `
